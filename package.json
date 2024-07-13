@@ -1,0 +1,13 @@
+{
+  "name": "n4-mp-auth-be",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [],
+  "author": "Gabriel Ferrin",
+  "license": "ISC",
+  "description": "Autenticación de usuarios"
+}
