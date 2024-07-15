@@ -1,5 +1,6 @@
 const allowedOrigins = new Set([
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://n4-mp-auth-fe.onrender.com'
 ])
 
 export const corsMiddleware = (req, res, next) => {
