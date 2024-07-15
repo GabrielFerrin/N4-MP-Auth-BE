@@ -80,7 +80,7 @@ const updateUser = async (userId, email, data) => {
   try {
     let query = 'SELECT * FROM user WHERE user_id = ? AND email = ?'
     if (data.password) {
-      const [response] = await db.query(query, [userId, email])
+      const [response] = await db.execute(query, [userId, email])
       if (response.length === 1) {
         if (!await bcrypt.compare(data.currentPassword, response[0].password)) {
           message = 'La contraseña no coincide'
