@@ -1,3 +1,4 @@
+import { attachFile } from '../middlewares/multer.js'
 import userM from '../models/user.js'
 
 const createUser = async (req, res) => {
@@ -59,15 +60,32 @@ const verifyToken = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { userId, email, token } = req.auth
-  const result = await userM.getUser(userId, email)
-  result.token = token // refresh token
-  res.status(result.status).json(result)
+  const response = await userM.getUser(userId, email)
+  response.token = token // refresh token
+  // get foto
+  res.status(response.status).json(response)
+}
+
+const getImage = async (req, res) => {
+  const { userId, email } = req.auth
+  const filename = await userM.getImage(userId, email)
+  const message = 'Imagen no encontrada'
+  if (!filename.success) {
+    return res.status(500).send({ success: false, status: 500, message })
+  }
+  const image = attachFile(filename.data)
+  if (!image.success) {
+    return res.status(500).send({ success: false, status: 500, message })
+  }
+  res.setHeader('Content-Type', `image/${image.ext}`)
+  res.send(image.data)
 }
 
 const updateUser = async (req, res) => {
   // validations
   const errorsList = []
   delete req.body.email // not allowed
+  delete req.body.image // not required
   if (req.body.password) validateUserUpdate(req.body, errorsList)
   // validate new password and email
   if (errorsList.length) {
@@ -89,6 +107,17 @@ const validateUserUpdate = (data, errorsList) => {
     errorsList.push('La contraseña no puede estar vacía')
   password && !passwordIsValid(password) &&
     errorsList.push('La contraseña no es válida')
+}
+
+const uploadImage = async (req, res) => {
+  const { userId, email } = req.auth
+  const { filename } = req.body
+  if (!userId || !email) {
+    const message = 'Credenciales inválidas'
+    return res.status(401).send({ success: false, status: 401, message })
+  }
+  const updateImg = await userM.uploadImage(userId, email, filename)
+  return res.status(updateImg.status).json(updateImg)
 }
 
 // manage table
@@ -115,5 +144,7 @@ export default {
   login,
   updateUser,
   verifyToken,
-  getUser
+  getUser,
+  uploadImage,
+  getImage
 }

@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import db from '../config/db.js'
 import { JWT_SECRET } from '../config/config.js'
+import { deleteFile } from '../middlewares/multer.js'
 
 // REGISTER
 const createUser = async (data) => {
@@ -74,6 +75,18 @@ const getUser = async (userId, email) => {
   }
 }
 
+const getImage = async (userId, email) => {
+  try {
+    const query = 'SELECT * FROM user WHERE user_id = ? AND email = ?'
+    const [response] = await db.query(query, [userId, email])
+    const user = response[0]
+    return { success: true, data: user.foto }
+  } catch (error) {
+    const message = 'Error interno'
+    return { success: false, status: 500, message, error: error.message }
+  }
+}
+
 // UPDATE
 const updateUser = async (userId, email, data) => {
   let message = ''
@@ -109,6 +122,27 @@ const updateUser = async (userId, email, data) => {
   } catch (error) {
     message = 'Error interno'
     return { success: false, status: 500, message, error: error.message }
+  }
+}
+
+// UPLOAD IMAGE
+const uploadImage = async (userId, email, filename) => {
+  if (userId) {
+    try {
+      let query = 'SELECT * FROM user WHERE user_id = ? AND email = ?'
+      const [response] = await db.query(query, [userId, email])
+      if (response[0].foto) {
+        console.log(response[0])
+        deleteFile(response[0].foto)
+      }
+      query = 'UPDATE user SET foto = ? WHERE user_id = ? AND email = ?'
+      await db.query(query, [filename, userId, email])
+      return { success: true, status: 200, message: 'Imagen cargada' }
+    } catch (error) {
+      return { success: false, status: 500, message: error.message }
+    }
+  } else {
+    return { success: false, status: 401, message: 'Credenciales inválidas' }
   }
 }
 
@@ -166,5 +200,7 @@ export default {
   createTale,
   login,
   updateUser,
-  getUser
+  getUser,
+  getImage,
+  uploadImage
 }

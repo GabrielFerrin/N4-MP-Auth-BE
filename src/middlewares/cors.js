@@ -12,7 +12,7 @@ export const corsMiddleware = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.removeHeader('X-Powered-By')
 
-  console.log('Origin:', origin)
+  // console.log('Origin:', origin)
 
   next()
 }
