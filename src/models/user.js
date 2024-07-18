@@ -132,7 +132,6 @@ const uploadImage = async (userId, email, filename) => {
       let query = 'SELECT * FROM user WHERE user_id = ? AND email = ?'
       const [response] = await db.query(query, [userId, email])
       if (response[0].foto) {
-        console.log(response[0])
         deleteFile(response[0].foto)
       }
       query = 'UPDATE user SET foto = ? WHERE user_id = ? AND email = ?'
