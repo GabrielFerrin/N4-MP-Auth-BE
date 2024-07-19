@@ -16,8 +16,8 @@ router.post('/upload-image', auth, uploadImage.single('image'),
   fileError, userC.uploadImage)
 
 // manage table
-router.post('/create-table', userC.createTale)
-router.get('/get-all', userC.getAllUsers)
-router.delete('/delete-table', userC.dropTable)
+// router.post('/create-table', userC.createTale)
+// router.get('/get-all', userC.getAllUsers)
+// router.delete('/delete-table', userC.dropTable)
 
 export default router
